@@ -1,16 +1,40 @@
 import os
+import requests
 from dotenv import load_dotenv
-import google.generativeai as genai
 
 load_dotenv()
 
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+API_KEY = os.getenv("GEMINI_API_KEY")
 
-model = genai.GenerativeModel("gemini-2.5-flash")
+URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={API_KEY}"
 
 
 def ask_gemini(prompt: str):
-    print("Calling Gemini...")
-    response = model.generate_content(prompt)
-    print("Gemini replied")
-    return response.text
+    headers = {
+        "Content-Type": "application/json"
+    }
+
+    body = {
+        "contents": [
+            {
+                "parts": [
+                    {
+                        "text": prompt
+                    }
+                ]
+            }
+        ]
+    }
+
+    response = requests.post(
+        URL,
+        headers=headers,
+        json=body,
+        timeout=60
+    )
+
+    response.raise_for_status()
+
+    data = response.json()
+
+    return data["candidates"][0]["content"]["parts"][0]["text"]
