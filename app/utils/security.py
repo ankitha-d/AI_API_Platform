@@ -3,7 +3,7 @@ from datetime import datetime, timedelta, timezone
 from jose import jwt
 from passlib.context import CryptContext
 
-SECRET_KEY = "change_this_to_a_long_random_secret_key"
+SECRET_KEY = "c73db13c-b395-4a80-b904-cc5d51920922"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
