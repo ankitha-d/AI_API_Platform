@@ -31,7 +31,9 @@ app.include_router(history_router)
 app.include_router(profile_router)
 @app.get("/")
 def home():
-    return {"message": "AI API Platform Running 🚀"}
+    return {
+        "message": "BUILD JULY 6 TEST"
+    }
 
 
 @app.get("/me")
