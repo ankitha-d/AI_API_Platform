@@ -1,14 +1,15 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from app.database.database import get_db
 from app.models.chat import Chat
 from app.models.user import User
+from app.models.usage import Usage
 from app.auth.auth import get_current_user
 from app.services.gemini_service import ask_gemini
-from app.models.usage import Usage
 from app.middleware.rate_limit import check_rate_limit
+
 router = APIRouter()
 
 
@@ -22,29 +23,37 @@ def chat(
     current_user=Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    print("STEP 1")
+    try:
+        user = db.query(User).filter(
+            User.email == current_user["sub"]
+        ).first()
 
-    user = db.query(User).filter(User.email == current_user["sub"]).first()
-    print("STEP 2")
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
 
-    usage = Usage(user_id=user.id)
-    db.add(usage)
-    print("STEP 3")
+        usage = Usage(user_id=user.id)
+        db.add(usage)
 
-    check_rate_limit(user.id, db)
-    print("STEP 4")
+        check_rate_limit(user.id, db)
 
-    answer = ask_gemini(request.prompt)
-    print("STEP 5")
+        answer = ask_gemini(request.prompt)
 
-    chat = Chat(
-        user_id=user.id,
-        prompt=request.prompt,
-        response=answer,
-    )
+        chat = Chat(
+            user_id=user.id,
+            prompt=request.prompt,
+            response=answer,
+        )
 
-    db.add(chat)
-    db.commit()
-    print("STEP 6")
+        db.add(chat)
+        db.commit()
 
-    return {"response": answer}
+        return {
+            "response": answer
+        }
+
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )

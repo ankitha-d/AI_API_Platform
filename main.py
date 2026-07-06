@@ -18,7 +18,10 @@ from app.api.profile import router as profile_router
 
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI(title="AI API Platform")
+app = FastAPI(
+    title="AI API Platform",
+    debug=True
+)
 
 app.include_router(user_router)
 app.include_router(chat_router)
