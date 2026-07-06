@@ -33,6 +33,9 @@ def ask_gemini(prompt: str):
         timeout=60
     )
 
+    print("STATUS:", response.status_code)
+    print("BODY:", response.text)
+
     response.raise_for_status()
 
     data = response.json()
