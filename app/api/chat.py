@@ -22,13 +22,20 @@ def chat(
     current_user=Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
+    print("STEP 1")
 
     user = db.query(User).filter(User.email == current_user["sub"]).first()
+    print("STEP 2")
+
     usage = Usage(user_id=user.id)
     db.add(usage)
+    print("STEP 3")
+
     check_rate_limit(user.id, db)
+    print("STEP 4")
 
     answer = ask_gemini(request.prompt)
+    print("STEP 5")
 
     chat = Chat(
         user_id=user.id,
@@ -38,7 +45,6 @@ def chat(
 
     db.add(chat)
     db.commit()
+    print("STEP 6")
 
-    return {
-        "response": answer
-    }
+    return {"response": answer}
