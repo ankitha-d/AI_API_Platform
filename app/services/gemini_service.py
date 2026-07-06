@@ -4,12 +4,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-API_KEY = os.getenv("GEMINI_API_KEY", "").strip()
-
-URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={API_KEY}"
-
-
 def ask_gemini(prompt: str):
+    api_key = os.getenv("GEMINI_API_KEY", "").strip()
+
+    print("KEY:", api_key)
+
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}"
+
     headers = {
         "Content-Type": "application/json"
     }
@@ -27,17 +28,15 @@ def ask_gemini(prompt: str):
     }
 
     response = requests.post(
-        URL,
+        url,
         headers=headers,
         json=body,
         timeout=60
     )
 
-    print("STATUS:", response.status_code)
-    print("BODY:", response.text)
+    print(response.status_code)
+    print(response.text)
 
     response.raise_for_status()
 
-    data = response.json()
-
-    return data["candidates"][0]["content"]["parts"][0]["text"]
+    return response.json()["candidates"][0]["content"]["parts"][0]["text"]
