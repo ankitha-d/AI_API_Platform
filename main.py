@@ -29,12 +29,18 @@ app.include_router(api_key_router)
 app.include_router(dashboard_router)
 app.include_router(history_router)
 app.include_router(profile_router)
+import os
+
 @app.get("/")
 def home():
-    return {
-        "message": "BUILD JULY 6 TEST"
-    }
+    key = os.getenv("GEMINI_API_KEY", "").strip()
 
+    return {
+        "message": "BUILD JULY 6 TEST",
+        "key_prefix": key[:12],
+        "key_suffix": key[-6:],
+        "length": len(key)
+    }
 
 @app.get("/me")
 def me(current_user=Depends(get_current_user)):
