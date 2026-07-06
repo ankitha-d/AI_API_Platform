@@ -7,7 +7,7 @@ load_dotenv()
 def ask_gemini(prompt: str):
     api_key = os.getenv("GEMINI_API_KEY", "").strip()
 
-    print("KEY:", api_key)
+    
 
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}"
 
@@ -34,8 +34,6 @@ def ask_gemini(prompt: str):
         timeout=60
     )
 
-    print(response.status_code)
-    print(response.text)
 
     response.raise_for_status()
 
